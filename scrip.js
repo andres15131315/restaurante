@@ -81,7 +81,7 @@ function imprimirRecibo() {
     localStorage.removeItem("productos");
     mostrarProductos();
     alert("✅ Recibo impreso. El carrito ha sido limpiado.");
-  }, 2000);
+  }, 5000);
 }
 
 document.addEventListener("DOMContentLoaded", mostrarProductos);
