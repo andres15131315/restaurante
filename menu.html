@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Menú Predeterminado</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Menú Predeterminado</h1>
+
+  <div class="botones">
+    <button onclick="window.location.href='index.html'">⬅ Ir al Menú Principal</button>
+  </div>
+
+  <div id="menu-fijo" class="card-container"></div>
+
+  <script src="productos.js"></script>
+  <script>
+    inicializarProductosBase();
+
+    function formatoCOP(valor) {
+      return valor.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      });
+    }
+
+    function mostrarMenuFijo() {
+      const productosBase = obtenerProductosBase();
+      const productosUsuario = obtenerPredeterminados();
+      const productosFijos = [
+        ...productosBase.map(p => ({ ...p, tipo: 'base' })),
+        ...productosUsuario.map(p => ({ ...p, tipo: 'usuario' }))
+      ];
+
+      const contenedor = document.getElementById("menu-fijo");
+      contenedor.innerHTML = "";
+
+      productosFijos.forEach((producto, index) => {
+        const div = document.createElement("div");
+        div.className = "tarjeta";
+
+        div.innerHTML = `
+          <img src="${producto.imagen}" class="imagen-plato" alt="${producto.nombre}" />
+          <h3>${producto.nombre}</h3>
+          <p>${formatoCOP(producto.precio)}</p>
+          <button onclick='agregarProductoDesdeMenu(${JSON.stringify(producto).replace(/'/g, "\\'")})'>
+            Agregar al carrito
+          </button>
+          ${
+            producto.tipo === 'usuario'
+              ? `<button class="eliminar" onclick="eliminarProductoFijo(${index - productosBase.length}, 'usuario')">Eliminar</button>`
+              : `<button class="eliminar" onclick="eliminarProductoFijo(${index}, 'base')">Eliminar</button>`
+          }
+        `;
+
+        contenedor.appendChild(div);
+      });
+    }
+
+    function agregarProductoDesdeMenu(producto) {
+      const fechaHora = new Date().toLocaleString("es-CO");
+      const productoConFecha = { ...producto, fechaHora };
+      agregarProducto(productoConFecha);
+      alert("✅ Producto agregado al menú principal.");
+    }
+
+    function eliminarProductoFijo(index, tipo) {
+      if (tipo === 'base') {
+        const base = obtenerProductosBase();
+        base.splice(index, 1);
+        guardarProductosBase(base);
+      } else {
+        const user = obtenerPredeterminados();
+        user.splice(index, 1);
+        guardarPredeterminados(user);
+      }
+      mostrarMenuFijo();
+    }
+
+    document.addEventListener("DOMContentLoaded", mostrarMenuFijo);
+  </script>
+</body>
+</html>

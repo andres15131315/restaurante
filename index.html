@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Menú Restaurante</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h1>Menú del Restaurante</h1>
+
+  <div class="botones">
+    <button onclick="window.location.href='agregar.html'">➕ Agregar Producto</button>
+    <button onclick="window.location.href='menu.html'">📋 Ver Menú Predeterminado</button>
+    <button onclick="imprimirRecibo()">🧾 Imprimir Recibo</button>
+  </div>
+
+  <div id="menu" class="card-container"></div>
+  <div class="total" id="total"></div>
+
+  <script src="productos.js"></script>
+  <script src="scrip.js"></script>
+</body>
+</html>
