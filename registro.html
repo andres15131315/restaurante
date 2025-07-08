@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Registro de Actividad</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -10,9 +10,8 @@
     <button onclick="window.location.href='index.html'">⬅ Volver al Menú</button>
   </div>
 
-  <h1>Registro de Ventas del Día</h1>
-
-  <div id="registro-container" class="card-container"></div>
+  <h1>Resumen de Productos Vendidos</h1>
+  <div id="inventario-container" class="card-container"></div>
 
   <div class="botones">
     <button onclick="generarPDF()">📄 Generar PDF</button>
@@ -28,37 +27,51 @@
       });
     }
 
-    function mostrarRegistro() {
-      const contenedor = document.getElementById("registro-container");
-      let registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
-
-      // Eliminar registros con más de 24 horas
-      const ahora = Date.now();
-      const unDia = 24 * 60 * 60 * 1000;
-      registro = registro.filter(venta => ahora - venta.timestamp <= unDia);
-      localStorage.setItem("registroVentas", JSON.stringify(registro));
+    function mostrarInventario() {
+      const contenedor = document.getElementById("inventario-container");
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
 
       if (registro.length === 0) {
         contenedor.innerHTML = "<p>No hay ventas registradas.</p>";
         return;
       }
 
-      contenedor.innerHTML = "";
+      // Map para contar productos vendidos
+      const resumen = {};
+      let totalGeneral = 0;
+
       registro.forEach((venta) => {
+        venta.productos.forEach((prod) => {
+          if (!resumen[prod.nombre]) {
+            resumen[prod.nombre] = {
+              cantidad: 0,
+              ingreso: 0,
+              precio: prod.precio,
+            };
+          }
+          resumen[prod.nombre].cantidad += prod.cantidad;
+          resumen[prod.nombre].ingreso += prod.precio * prod.cantidad;
+          totalGeneral += prod.precio * prod.cantidad;
+        });
+      });
+
+      contenedor.innerHTML = "";
+      for (const nombre in resumen) {
+        const item = resumen[nombre];
         const div = document.createElement("div");
         div.className = "tarjeta";
-        let contenido = `
-          <h3>Mesa: ${venta.mesa}</h3>
-          <p>Fecha: ${venta.fecha}</p>
-          <ul style="text-align:left;">
+        div.innerHTML = `
+          <h3>${nombre}</h3>
+          <p>Cantidad Vendida: ${item.cantidad}</p>
+          <p>Ganancia: ${formatoCOP(item.ingreso)}</p>
         `;
-        venta.productos.forEach(prod => {
-          contenido += `<li>${prod.nombre} x${prod.cantidad} - ${formatoCOP(prod.precio * prod.cantidad)}</li>`;
-        });
-        contenido += `</ul><p><strong>Total: ${formatoCOP(venta.total)}</strong></p>`;
-        div.innerHTML = contenido;
         contenedor.appendChild(div);
-      });
+      }
+
+      const totalDiv = document.createElement("div");
+      totalDiv.className = "tarjeta";
+      totalDiv.innerHTML = `<h3>Total Ganado: ${formatoCOP(totalGeneral)}</h3>`;
+      contenedor.appendChild(totalDiv);
     }
 
     function generarPDF() {
@@ -68,20 +81,31 @@
         return;
       }
 
-      let contenido = "📋 REGISTRO DE VENTAS DEL DÍA\n\n";
+      const resumen = {};
       let totalGeneral = 0;
 
-      registro.forEach(venta => {
-        contenido += `Mesa: ${venta.mesa}\nFecha: ${venta.fecha}\n`;
-        venta.productos.forEach(prod => {
-          const subtotal = prod.precio * prod.cantidad;
-          contenido += `  - ${prod.nombre} x${prod.cantidad}: ${formatoCOP(subtotal)}\n`;
+      registro.forEach((venta) => {
+        venta.productos.forEach((prod) => {
+          if (!resumen[prod.nombre]) {
+            resumen[prod.nombre] = {
+              cantidad: 0,
+              ingreso: 0,
+              precio: prod.precio,
+            };
+          }
+          resumen[prod.nombre].cantidad += prod.cantidad;
+          resumen[prod.nombre].ingreso += prod.precio * prod.cantidad;
+          totalGeneral += prod.precio * prod.cantidad;
         });
-        contenido += `Total: ${formatoCOP(venta.total)}\n\n`;
-        totalGeneral += venta.total;
       });
 
-      contenido += `\nTOTAL GENERAL: ${formatoCOP(totalGeneral)}\n`;
+      let contenido = "📋 RESUMEN DE PRODUCTOS VENDIDOS\n\n";
+      for (const nombre in resumen) {
+        const item = resumen[nombre];
+        contenido += `${nombre} - Cantidad: ${item.cantidad} - Ingreso: ${formatoCOP(item.ingreso)}\n`;
+      }
+
+      contenido += `\nTOTAL GANADO: ${formatoCOP(totalGeneral)}\n`;
       contenido += `Fecha de descarga: ${new Date().toLocaleString("es-CO")}`;
 
       const ventana = window.open("", "", "width=500,height=700");
@@ -90,14 +114,14 @@
     }
 
     function limpiarRegistro() {
-      if (confirm("¿Estás seguro de borrar todas las ventas del día?")) {
+      if (confirm("¿Estás seguro de borrar todas las ventas?")) {
         localStorage.removeItem("registroVentas");
-        mostrarRegistro();
+        mostrarInventario();
         alert("🗑 Registro limpiado correctamente.");
       }
     }
 
-    document.addEventListener("DOMContentLoaded", mostrarRegistro);
+    document.addEventListener("DOMContentLoaded", mostrarInventario);
   </script>
 </body>
 </html>

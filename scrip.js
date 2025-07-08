@@ -12,8 +12,6 @@ function mostrarProductos() {
   const totalElemento = document.getElementById("total");
   contenedor.innerHTML = "";
 
-  let total = 0;
-
   productos.forEach((producto, index) => {
     const div = document.createElement("div");
     div.className = "tarjeta";
@@ -26,22 +24,18 @@ function mostrarProductos() {
       ${imagenHTML}
       <h3>${producto.nombre}</h3>
       <p>Precio unitario: ${formatoCOP(producto.precio)}</p>
-      <input type="number" min="1" value="1" id="cantidad-${index}" class="input-cantidad" />
+      <input type="number" min="0" value="0" id="cantidad-${index}" class="input-cantidad" />
       <p class="fecha">🕓 ${producto.fechaHora}</p>
       <button onclick="eliminarProducto(${index})" class="eliminar">Eliminar</button>
     `;
 
     contenedor.appendChild(div);
 
-    // Sumar precio base
-    total += producto.precio;
-
-    // Escuchar cambios para actualizar el total
     const inputCantidad = div.querySelector(`#cantidad-${index}`);
     inputCantidad.addEventListener("input", calcularTotal);
   });
 
-  totalElemento.innerHTML = `<strong>Total: ${formatoCOP(total)}</strong>`;
+  calcularTotal();
 }
 
 function calcularTotal() {
@@ -49,8 +43,10 @@ function calcularTotal() {
   let total = 0;
 
   productos.forEach((producto, index) => {
-    const cantidad = parseInt(document.getElementById(`cantidad-${index}`)?.value || 1);
-    total += producto.precio * cantidad;
+    const cantidad = parseInt(document.getElementById(`cantidad-${index}`)?.value || 0);
+    if (cantidad > 0) {
+      total += producto.precio * cantidad;
+    }
   });
 
   document.getElementById("total").innerHTML = `<strong>Total: ${formatoCOP(total)}</strong>`;
@@ -76,17 +72,25 @@ function imprimirRecibo() {
   const resumenProductos = [];
 
   productos.forEach((producto, index) => {
-    const cantidad = parseInt(document.getElementById(`cantidad-${index}`)?.value || 1);
-    const subtotal = producto.precio * cantidad;
-    recibo += `${producto.nombre} x${cantidad} - ${formatoCOP(subtotal)}\n`;
-    total += subtotal;
+    const cantidad = parseInt(document.getElementById(`cantidad-${index}`)?.value || 0);
 
-    resumenProductos.push({
-      nombre: producto.nombre,
-      precio: producto.precio,
-      cantidad,
-    });
+    if (cantidad > 0) {
+      const subtotal = producto.precio * cantidad;
+      recibo += `${producto.nombre} x${cantidad} - ${formatoCOP(subtotal)}\n`;
+      total += subtotal;
+
+      resumenProductos.push({
+        nombre: producto.nombre,
+        precio: producto.precio,
+        cantidad,
+      });
+    }
   });
+
+  if (resumenProductos.length === 0) {
+    alert("⚠️ No se seleccionaron productos con cantidad mayor a 0.");
+    return;
+  }
 
   recibo += `\nTOTAL: ${formatoCOP(total)}`;
   recibo += `\nFecha: ${new Date().toLocaleString("es-CO")}`;
@@ -110,21 +114,24 @@ function imprimirRecibo() {
 
   setTimeout(() => {
     ventana.close();
-    localStorage.removeItem("productos"); // Limpiar el carrito
-    mostrarProductos();
+    reiniciarCantidades(); // Reinicia cantidades a 0 pero NO borra productos
     alert("✅ Recibo impreso. Pedido registrado.");
   }, 500);
 }
 
-// Guarda compras en el historial de actividad
-function guardarEnHistorial(productos, mesa) {
-  const registro = JSON.parse(localStorage.getItem("registroActividades")) || [];
-  registro.push({
-    mesa,
-    productos,
-    fecha: new Date().toLocaleString("es-CO")
+function reiniciarCantidades() {
+  const productos = obtenerProductos();
+  mostrarProductos(); // Redibuja las tarjetas
+
+  // Reiniciar los inputs a 0 después de dibujar
+  productos.forEach((_, index) => {
+    const input = document.getElementById(`cantidad-${index}`);
+    if (input) {
+      input.value = 0;
+    }
   });
-  localStorage.setItem("registroActividades", JSON.stringify(registro));
+
+  calcularTotal(); // El total vuelve a 0
 }
 
 document.addEventListener("DOMContentLoaded", mostrarProductos);

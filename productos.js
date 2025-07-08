@@ -32,34 +32,40 @@ function guardarProductosBase(productos) {
 function inicializarProductosBase() {
   if (!localStorage.getItem("productosBase")) {
     const base = [
-      {
-        nombre: "Hamburguesa Clásica",
-        precio: 15000,
-        imagen: "https://cdn-icons-png.flaticon.com/512/5787/5787198.png",
-        fechaHora: "Base"
-      },
-      {
-        nombre: "Pizza Personal",
-        precio: 18000,
-        imagen: "https://cdn-icons-png.flaticon.com/512/1404/1404945.png",
-        fechaHora: "Base"
-      },
-      {
-        nombre: "Ensalada Fresca",
-        precio: 12000,
-        imagen: "https://cdn-icons-png.flaticon.com/512/2917/2917242.png",
-        fechaHora: "Base"
-      },
-      {
-        nombre: "Taco Mexicano",
-        precio: 16000,
-        imagen: "https://cdn-icons-png.flaticon.com/512/5787/5787147.png",
-        fechaHora: "Base"
-      }
+      { nombre: "Sancocho de gallina", precio: 8000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", fechaHora: "Base" },
+      { nombre: "Sancocho de gallina (Pequeño)", precio: 4000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", fechaHora: "Base" },
+
+      { nombre: "Chuleta de pollo y cerdo", precio: 37000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046762.png", fechaHora: "Base" },
+      { nombre: "1/2 Chuleta", precio: 21000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046762.png", fechaHora: "Base" },
+
+      { nombre: "Sancocho de espinazo", precio: 9000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", fechaHora: "Base" },
+      { nombre: "Sancocho de espinazo (Pequeño)", precio: 5000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046784.png", fechaHora: "Base" },
+
+      { nombre: "Trucha", precio: 30000, imagen: "https://cdn-icons-png.flaticon.com/512/3480/3480314.png", fechaHora: "Base" },
+      { nombre: "Tilapia", precio: 34000, imagen: "https://cdn-icons-png.flaticon.com/512/3480/3480314.png", fechaHora: "Base" },
+
+      { nombre: "Churrasco", precio: 37000, imagen: "https://cdn-icons-png.flaticon.com/512/2718/2718224.png", fechaHora: "Base" },
+      { nombre: "1/2 Churrasco", precio: 26000, imagen: "https://cdn-icons-png.flaticon.com/512/2718/2718224.png", fechaHora: "Base" },
+
+      { nombre: "Bandeja de costilla", precio: 19000, imagen: "https://cdn-icons-png.flaticon.com/512/2635/2635450.png", fechaHora: "Base" },
+      { nombre: "Bandeja de carne frita", precio: 19000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046786.png", fechaHora: "Base" },
+      { nombre: "Bandeja de carne asada", precio: 19000, imagen: "https://cdn-icons-png.flaticon.com/512/2718/2718224.png", fechaHora: "Base" },
+      { nombre: "Bandeja de gallina", precio: 19000, imagen: "https://cdn-icons-png.flaticon.com/512/1998/1998611.png", fechaHora: "Base" },
+
+      { nombre: "Adición de hueso", precio: 4000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046789.png", fechaHora: "Base" },
+      { nombre: "Adición de frijol", precio: 2000, imagen: "https://cdn-icons-png.flaticon.com/512/2909/2909765.png", fechaHora: "Base" },
+      { nombre: "Adición de carne", precio: 9000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046786.png", fechaHora: "Base" },
+      { nombre: "Adición de costilla", precio: 9000, imagen: "https://cdn-icons-png.flaticon.com/512/2635/2635450.png", fechaHora: "Base" },
+      { nombre: "Adición de arroz", precio: 2000, imagen: "https://cdn-icons-png.flaticon.com/512/1998/1998613.png", fechaHora: "Base" },
+      { nombre: "Adición de papas", precio: 4000, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046780.png", fechaHora: "Base" },
+      { nombre: "Adición de patacón", precio: 4000, imagen: "https://cdn-icons-png.flaticon.com/512/135/135620.png", fechaHora: "Base" },
+
+      { nombre: "Picadas", precio: 0, imagen: "https://cdn-icons-png.flaticon.com/512/1046/1046767.png", fechaHora: "Base" }
     ];
     guardarProductosBase(base);
   }
 }
+
 
 // === Productos creados por el usuario ===
 function obtenerPredeterminados() {

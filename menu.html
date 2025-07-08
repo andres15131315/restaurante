@@ -8,6 +8,11 @@
 <body>
   <h1>Menú Predeterminado</h1>
 
+  <!-- 🔁 Botón para reiniciar menú -->
+  <button onclick="reiniciarProductos()" style="background:red;color:white;padding:10px;margin-bottom:15px;">
+    🔄 Reiniciar Menú (borrar localStorage)
+  </button>
+
   <div class="botones">
     <button onclick="window.location.href='index.html'">⬅ Ir al Menú Principal</button>
   </div>
@@ -16,8 +21,10 @@
 
   <script src="productos.js"></script>
   <script>
+    // Cargar productos base por defecto
     inicializarProductosBase();
 
+    // Mostrar menú predeterminado
     function formatoCOP(valor) {
       return valor.toLocaleString("es-CO", {
         style: "currency",
@@ -77,6 +84,16 @@
         guardarPredeterminados(user);
       }
       mostrarMenuFijo();
+    }
+
+    // 🔁 Función para borrar todo y reiniciar
+    function reiniciarProductos() {
+      localStorage.removeItem("productos");
+      localStorage.removeItem("productosBase");
+      localStorage.removeItem("productosPredeterminados");
+      inicializarProductosBase();
+      mostrarMenuFijo();
+      alert("🧹 Menú reiniciado. Ya puedes ver los productos con imágenes.");
     }
 
     document.addEventListener("DOMContentLoaded", mostrarMenuFijo);

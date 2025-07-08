@@ -1,3 +1,4 @@
+/* Reset básico */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,17 +12,19 @@ body {
   padding: 20px;
 }
 
+/* Títulos */
 h1 {
   text-align: center;
   margin-bottom: 20px;
   color: #222;
 }
 
+/* Botones */
 .botones {
   display: flex;
   justify-content: center;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -43,25 +46,47 @@ button:hover {
 button.eliminar {
   background-color: #e53935;
 }
+
 button.eliminar:hover {
   background-color: #c62828;
 }
 
+/* Selector de mesa */
+.mesa-selector {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.mesa-selector label {
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+select#mesa {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  color: black;
+}
+
+/* Contenedor de tarjetas */
 .card-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 16px;
   margin-top: 20px;
   overflow-x: auto;
 }
 
+/* Tarjetas de producto */
 .tarjeta {
   background-color: white;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  width: 200px;
-  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 260px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,6 +98,7 @@ button.eliminar:hover {
   transform: translateY(-4px);
 }
 
+/* Imagen de plato */
 .imagen-plato {
   width: 100%;
   height: 120px;
@@ -92,6 +118,7 @@ button.eliminar:hover {
   margin: 4px 0;
 }
 
+/* Input cantidad */
 .input-cantidad {
   width: 60px;
   padding: 6px;
@@ -102,6 +129,7 @@ button.eliminar:hover {
   font-size: 14px;
 }
 
+/* Total */
 .total {
   text-align: center;
   font-size: 18px;
@@ -109,12 +137,15 @@ button.eliminar:hover {
   margin-top: 30px;
 }
 
+/* Formulario */
 form {
   max-width: 400px;
   margin: 0 auto;
 }
 
-input {
+input[type="text"],
+input[type="number"],
+input[type="file"] {
   width: 100%;
   padding: 10px;
   font-size: 14px;
@@ -123,6 +154,7 @@ input {
   border-radius: 6px;
 }
 
+/* Responsive */
 @media (max-width: 600px) {
   .tarjeta {
     width: 100%;
@@ -137,32 +169,4 @@ input {
   button {
     width: 90%;
   }
-}
-.mesa-selector {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.mesa-selector label {
-  font-weight: bold;
-  margin-right: 10px;
-}
-select#mesa {
-color: black;
-}
-.card-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.tarjeta {
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  width: 260px;
-  padding: 14px;
-  text-align: center;
 }

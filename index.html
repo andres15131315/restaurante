@@ -6,41 +6,46 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div style="position: absolute; top: 20px; left: 20px;">
+    <button onclick="window.location.href='registro.html'">📌 Registro de Actividad</button>
+  </div>
 
-  <h1 style="text-align: center;">Menú del Restaurante</h1>
+  <h1>Menú del Restaurante</h1>
 
   <div class="botones">
     <button onclick="window.location.href='agregar.html'">➕ Agregar Producto</button>
     <button onclick="window.location.href='menu.html'">📋 Ver Menú Predeterminado</button>
-<button onclick="window.location.href='registro.html'">📌 Registro de Actividad</button>
     <button onclick="imprimirRecibo()">🧾 Imprimir Recibo</button>
   </div>
 
-  <!-- Selector de mesa -->
-  <div style="text-align: center; margin-bottom: 15px;">
-    <label for="mesa">Seleccionar Mesa:</label>
-    <select id="mesa" required>
-      <option value="">-- Mesa --</option>
-    </select>
-  </div>
+  <label for="mesa">Seleccionar Mesa:</label>
+  <select id="mesa" required>
+    <option value="">-- Mesa --</option>
+  </select>
 
   <div id="menu" class="card-container"></div>
   <div class="total" id="total"></div>
 
-  <script src="productos.js"></script>
-  <script src="scrip.js"></script>
+<script src="productos.js"></script>
+<script src="scrip.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Inicializar productos base si no existen
+    inicializarProductosBase();
 
-  <!-- Script para llenar las mesas -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const select = document.getElementById("mesa");
-      for (let i = 1; i <= 15; i++) {
-        const option = document.createElement("option");
-        option.value = `Mesa ${i}`;
-        option.textContent = `Mesa ${i}`;
-        select.appendChild(option);
-      }
-    });
-  </script>
+    // Crear opciones de mesas (1 a 15)
+    const select = document.getElementById("mesa");
+    for (let i = 1; i <= 15; i++) {
+      const option = document.createElement("option");
+      option.value = `Mesa ${i}`;
+      option.textContent = `Mesa ${i}`;
+      select.appendChild(option);
+    }
+
+    // Mostrar productos
+    mostrarProductos(); // Esta función debe estar en scrip.js
+  });
+</script>
+
 </body>
 </html>
