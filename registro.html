@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registro de Actividad</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div style="position: absolute; top: 20px; left: 20px;">
+    <button onclick="window.location.href='index.html'">⬅ Volver al Menú</button>
+  </div>
+
+  <h1>Registro de Ventas del Día</h1>
+
+  <div id="registro-container" class="card-container"></div>
+
+  <div class="botones">
+    <button onclick="generarPDF()">📄 Generar PDF</button>
+    <button onclick="limpiarRegistro()">🗑 Limpiar Registro</button>
+  </div>
+
+  <script>
+    function formatoCOP(valor) {
+      return valor.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      });
+    }
+
+    function mostrarRegistro() {
+      const contenedor = document.getElementById("registro-container");
+      let registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+
+      // Eliminar registros con más de 24 horas
+      const ahora = Date.now();
+      const unDia = 24 * 60 * 60 * 1000;
+      registro = registro.filter(venta => ahora - venta.timestamp <= unDia);
+      localStorage.setItem("registroVentas", JSON.stringify(registro));
+
+      if (registro.length === 0) {
+        contenedor.innerHTML = "<p>No hay ventas registradas.</p>";
+        return;
+      }
+
+      contenedor.innerHTML = "";
+      registro.forEach((venta) => {
+        const div = document.createElement("div");
+        div.className = "tarjeta";
+        let contenido = `
+          <h3>Mesa: ${venta.mesa}</h3>
+          <p>Fecha: ${venta.fecha}</p>
+          <ul style="text-align:left;">
+        `;
+        venta.productos.forEach(prod => {
+          contenido += `<li>${prod.nombre} x${prod.cantidad} - ${formatoCOP(prod.precio * prod.cantidad)}</li>`;
+        });
+        contenido += `</ul><p><strong>Total: ${formatoCOP(venta.total)}</strong></p>`;
+        div.innerHTML = contenido;
+        contenedor.appendChild(div);
+      });
+    }
+
+    function generarPDF() {
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+      if (registro.length === 0) {
+        alert("⚠️ No hay ventas para generar el PDF.");
+        return;
+      }
+
+      let contenido = "📋 REGISTRO DE VENTAS DEL DÍA\n\n";
+      let totalGeneral = 0;
+
+      registro.forEach(venta => {
+        contenido += `Mesa: ${venta.mesa}\nFecha: ${venta.fecha}\n`;
+        venta.productos.forEach(prod => {
+          const subtotal = prod.precio * prod.cantidad;
+          contenido += `  - ${prod.nombre} x${prod.cantidad}: ${formatoCOP(subtotal)}\n`;
+        });
+        contenido += `Total: ${formatoCOP(venta.total)}\n\n`;
+        totalGeneral += venta.total;
+      });
+
+      contenido += `\nTOTAL GENERAL: ${formatoCOP(totalGeneral)}\n`;
+      contenido += `Fecha de descarga: ${new Date().toLocaleString("es-CO")}`;
+
+      const ventana = window.open("", "", "width=500,height=700");
+      ventana.document.write(`<pre>${contenido}</pre>`);
+      ventana.print();
+    }
+
+    function limpiarRegistro() {
+      if (confirm("¿Estás seguro de borrar todas las ventas del día?")) {
+        localStorage.removeItem("registroVentas");
+        mostrarRegistro();
+        alert("🗑 Registro limpiado correctamente.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", mostrarRegistro);
+  </script>
+</body>
+</html>

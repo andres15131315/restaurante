@@ -55,33 +55,76 @@ function calcularTotal() {
 
   document.getElementById("total").innerHTML = `<strong>Total: ${formatoCOP(total)}</strong>`;
 }
+
 function imprimirRecibo() {
   const productos = obtenerProductos();
+  const mesa = document.getElementById("mesa").value;
+
+  if (!mesa) {
+    alert("⚠️ Debes seleccionar una mesa antes de imprimir.");
+    return;
+  }
+
+  if (productos.length === 0) {
+    alert("⚠️ No hay productos en el carrito.");
+    return;
+  }
+
   let recibo = "🧾 RECIBO DEL RESTAURANTE\n\n";
+  recibo += `Mesa: ${mesa}\n\n`;
   let total = 0;
+  const resumenProductos = [];
 
   productos.forEach((producto, index) => {
     const cantidad = parseInt(document.getElementById(`cantidad-${index}`)?.value || 1);
     const subtotal = producto.precio * cantidad;
     recibo += `${producto.nombre} x${cantidad} - ${formatoCOP(subtotal)}\n`;
     total += subtotal;
+
+    resumenProductos.push({
+      nombre: producto.nombre,
+      precio: producto.precio,
+      cantidad,
+    });
   });
 
   recibo += `\nTOTAL: ${formatoCOP(total)}`;
-  recibo += `\n\nFecha de impresión: ${new Date().toLocaleString("es-CO")}`;
+  recibo += `\nFecha: ${new Date().toLocaleString("es-CO")}`;
 
-  // Abrir ventana para imprimir
-  const nuevaVentana = window.open("", "", "width=400,height=600");
-  nuevaVentana.document.write(`<pre>${recibo}</pre>`);
-  nuevaVentana.print();
+  // Guardar en el registro de actividad
+  const venta = {
+    mesa,
+    productos: resumenProductos,
+    total,
+    fecha: new Date().toLocaleString("es-CO"),
+  };
+
+  const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+  registro.push(venta);
+  localStorage.setItem("registroVentas", JSON.stringify(registro));
+
+  // Imprimir
+  const ventana = window.open("", "", "width=400,height=600");
+  ventana.document.write(`<pre>${recibo}</pre>`);
+  ventana.print();
 
   setTimeout(() => {
-    nuevaVentana.close();
-    // 🔥 LIMPIA EL CARRITO DESPUÉS DE IMPRIMIR
-    localStorage.removeItem("productos");
+    ventana.close();
+    localStorage.removeItem("productos"); // Limpiar el carrito
     mostrarProductos();
-    alert("✅ Recibo impreso. El carrito ha sido limpiado.");
-  }, 5000);
+    alert("✅ Recibo impreso. Pedido registrado.");
+  }, 500);
+}
+
+// Guarda compras en el historial de actividad
+function guardarEnHistorial(productos, mesa) {
+  const registro = JSON.parse(localStorage.getItem("registroActividades")) || [];
+  registro.push({
+    mesa,
+    productos,
+    fecha: new Date().toLocaleString("es-CO")
+  });
+  localStorage.setItem("registroActividades", JSON.stringify(registro));
 }
 
 document.addEventListener("DOMContentLoaded", mostrarProductos);
