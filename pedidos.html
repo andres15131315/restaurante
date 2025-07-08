@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pedidos Guardados</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="header-bar">
+    <button onclick="window.location.href='index.html'">⬅ Volver al Menú</button>
+  </div>
+
+  <h1>Pedidos Guardados</h1>
+  <div id="contenedorPedidos" class="card-container"></div>
+
+  <script>
+    function formatoCOP(valor) {
+      return valor.toLocaleString("es-CO", {
+        style: "currency",
+        currency: "COP",
+        minimumFractionDigits: 0,
+      });
+    }
+
+    function mostrarPedidosGuardados() {
+      const contenedor = document.getElementById("contenedorPedidos");
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+
+      if (registro.length === 0) {
+        contenedor.innerHTML = "<p>No hay pedidos guardados.</p>";
+        return;
+      }
+
+      contenedor.innerHTML = "";
+      registro.forEach((pedido, index) => {
+        let productosHTML = "";
+        pedido.productos.forEach((p, i) => {
+          productosHTML += `
+            <div style="margin-bottom:10px;">
+              <strong>${p.nombre}</strong> <br/>
+              Cantidad: <input type="number" value="${p.cantidad}" min="1" onchange="actualizarCantidad(${index}, ${i}, this.value)" class="input-cantidad"/>
+              <p>Precio: ${formatoCOP(p.precio)}</p>
+            </div>
+          `;
+        });
+
+        const div = document.createElement("div");
+        div.className = "tarjeta";
+        div.innerHTML = `
+          <h3>Mesa: ${pedido.mesa}</h3>
+          <p>Fecha: ${pedido.fecha}</p>
+          ${productosHTML}
+          <p><strong>Total:</strong> ${formatoCOP(pedido.total)}</p>
+          <button onclick="imprimirPedido(${index})">🖨 Imprimir</button>
+          <button class="eliminar" onclick="eliminarPedido(${index})">🗑 Eliminar</button>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    function actualizarCantidad(pedidoIndex, productoIndex, nuevaCantidad) {
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+      const pedido = registro[pedidoIndex];
+      const producto = pedido.productos[productoIndex];
+      producto.cantidad = parseInt(nuevaCantidad);
+
+      // Recalcular total
+      let nuevoTotal = 0;
+      pedido.productos.forEach(p => {
+        nuevoTotal += p.precio * p.cantidad;
+      });
+      pedido.total = nuevoTotal;
+
+      localStorage.setItem("registroVentas", JSON.stringify(registro));
+      mostrarPedidosGuardados();
+    }
+
+    function imprimirPedido(index) {
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+      const pedido = registro[index];
+
+      let recibo = `🧾 RECIBO DEL RESTAURANTE\nMesa: ${pedido.mesa}\nFecha: ${pedido.fecha}\n\n`;
+      let total = 0;
+
+      pedido.productos.forEach(p => {
+        const subtotal = p.precio * p.cantidad;
+        recibo += `${p.nombre} x${p.cantidad} - ${formatoCOP(subtotal)}\n`;
+        total += subtotal;
+      });
+
+      recibo += `\nTOTAL: ${formatoCOP(total)}`;
+
+      const ventana = window.open("", "", "width=400,height=600");
+      ventana.document.write(`<pre>${recibo}</pre>`);
+      ventana.print();
+      setTimeout(() => ventana.close(), 500);
+    }
+
+    function eliminarPedido(index) {
+      if (confirm("¿Eliminar este pedido?")) {
+        const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+        registro.splice(index, 1);
+        localStorage.setItem("registroVentas", JSON.stringify(registro));
+        mostrarPedidosGuardados();
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", mostrarPedidosGuardados);
+  </script>
+</body>
+</html>

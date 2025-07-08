@@ -2,50 +2,105 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Menú Restaurante</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div style="position: absolute; top: 20px; left: 20px;">
+  <!-- Botón para Registro de Actividad -->
+  <div class="header-bar">
     <button onclick="window.location.href='registro.html'">📌 Registro de Actividad</button>
   </div>
 
   <h1>Menú del Restaurante</h1>
 
+  <!-- Botones principales -->
   <div class="botones">
     <button onclick="window.location.href='agregar.html'">➕ Agregar Producto</button>
     <button onclick="window.location.href='menu.html'">📋 Ver Menú Predeterminado</button>
-    <button onclick="imprimirRecibo()">🧾 Imprimir Recibo</button>
+    <button onclick="window.location.href='pedidos.html'">🗂 Ver Pedidos Guardados</button>
   </div>
 
-  <label for="mesa">Seleccionar Mesa:</label>
-  <select id="mesa" required>
-    <option value="">-- Mesa --</option>
-  </select>
+  <!-- Selector de mesa -->
+  <div class="mesa-selector">
+    <label for="mesa">Seleccionar Mesa:</label>
+    <select id="mesa" required>
+      <option value="">-- Mesa --</option>
+    </select>
+  </div>
 
+  <!-- Sección productos -->
   <div id="menu" class="card-container"></div>
+
+  <!-- Total -->
   <div class="total" id="total"></div>
 
-<script src="productos.js"></script>
-<script src="scrip.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    // Inicializar productos base si no existen
-    inicializarProductosBase();
+  <!-- Confirmar Pedido -->
+  <div class="botones confirmar">
+    <button onclick="confirmarPedido()">✅ Confirmar Pedido</button>
+  </div>
 
-    // Crear opciones de mesas (1 a 15)
-    const select = document.getElementById("mesa");
-    for (let i = 1; i <= 15; i++) {
-      const option = document.createElement("option");
-      option.value = `Mesa ${i}`;
-      option.textContent = `Mesa ${i}`;
-      select.appendChild(option);
+
+  <script src="productos.js"></script>
+  <script src="scrip.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      inicializarProductosBase();
+
+      const select = document.getElementById("mesa");
+      for (let i = 1; i <= 15; i++) {
+        const option = document.createElement("option");
+        option.value = `Mesa ${i}`;
+        option.textContent = `Mesa ${i}`;
+        select.appendChild(option);
+      }
+
+      mostrarProductos();
+    });
+
+    function confirmarPedido() {
+      const productos = obtenerProductos();
+      const mesa = document.getElementById("mesa").value;
+
+      if (!mesa) {
+        alert("⚠️ Debes seleccionar una mesa antes de confirmar.");
+        return;
+      }
+
+      const resumenProductos = [];
+      let total = 0;
+
+      productos.forEach((producto, index) => {
+        const cantidad = parseInt(document.getElementById(`cantidad-${index}`)?.value || 0);
+        if (cantidad > 0) {
+          resumenProductos.push({
+            nombre: producto.nombre,
+            precio: producto.precio,
+            cantidad,
+          });
+          total += producto.precio * cantidad;
+        }
+      });
+
+      if (resumenProductos.length === 0) {
+        alert("⚠️ No se han seleccionado productos.");
+        return;
+      }
+
+      const venta = {
+        mesa,
+        productos: resumenProductos,
+        total,
+        fecha: new Date().toLocaleString("es-CO"),
+      };
+
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+      registro.push(venta);
+      localStorage.setItem("registroVentas", JSON.stringify(registro));
+
+      alert("✅ Pedido confirmado y guardado. Puedes imprimirlo desde la sección de Pedidos Guardados.");
+      reiniciarCantidades();
     }
-
-    // Mostrar productos
-    mostrarProductos(); // Esta función debe estar en scrip.js
-  });
-</script>
-
+  </script>
 </body>
 </html>

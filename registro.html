@@ -6,13 +6,15 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div style="position: absolute; top: 20px; left: 20px;">
+  <!-- Botón para volver -->
+  <div class="header-bar">
     <button onclick="window.location.href='index.html'">⬅ Volver al Menú</button>
   </div>
 
   <h1>Resumen de Productos Vendidos</h1>
   <div id="inventario-container" class="card-container"></div>
 
+  <!-- Botones de acción -->
   <div class="botones">
     <button onclick="generarPDF()">📄 Generar PDF</button>
     <button onclick="limpiarRegistro()">🗑 Limpiar Registro</button>
@@ -27,6 +29,19 @@
       });
     }
 
+    function buscarMesaDelProducto(nombreProducto) {
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+
+      for (const venta of registro) {
+        for (const prod of venta.productos) {
+          if (prod.nombre === nombreProducto) {
+            return venta.mesa || "No registrada";
+          }
+        }
+      }
+      return "No registrada";
+    }
+
     function mostrarInventario() {
       const contenedor = document.getElementById("inventario-container");
       const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
@@ -36,7 +51,6 @@
         return;
       }
 
-      // Map para contar productos vendidos
       const resumen = {};
       let totalGeneral = 0;
 
@@ -64,6 +78,7 @@
           <h3>${nombre}</h3>
           <p>Cantidad Vendida: ${item.cantidad}</p>
           <p>Ganancia: ${formatoCOP(item.ingreso)}</p>
+          <p><strong>Mesa:</strong> ${buscarMesaDelProducto(nombre)}</p>
         `;
         contenedor.appendChild(div);
       }
@@ -91,6 +106,7 @@
               cantidad: 0,
               ingreso: 0,
               precio: prod.precio,
+              mesa: venta.mesa || "No registrada",
             };
           }
           resumen[prod.nombre].cantidad += prod.cantidad;
@@ -102,7 +118,7 @@
       let contenido = "📋 RESUMEN DE PRODUCTOS VENDIDOS\n\n";
       for (const nombre in resumen) {
         const item = resumen[nombre];
-        contenido += `${nombre} - Cantidad: ${item.cantidad} - Ingreso: ${formatoCOP(item.ingreso)}\n`;
+        contenido += `${nombre} - Cantidad: ${item.cantidad} - Ingreso: ${formatoCOP(item.ingreso)} - Mesa: ${item.mesa}\n`;
       }
 
       contenido += `\nTOTAL GANADO: ${formatoCOP(totalGeneral)}\n`;

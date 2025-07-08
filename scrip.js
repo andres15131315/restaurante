@@ -52,78 +52,10 @@ function calcularTotal() {
   document.getElementById("total").innerHTML = `<strong>Total: ${formatoCOP(total)}</strong>`;
 }
 
-function imprimirRecibo() {
-  const productos = obtenerProductos();
-  const mesa = document.getElementById("mesa").value;
-
-  if (!mesa) {
-    alert("⚠️ Debes seleccionar una mesa antes de imprimir.");
-    return;
-  }
-
-  if (productos.length === 0) {
-    alert("⚠️ No hay productos en el carrito.");
-    return;
-  }
-
-  let recibo = "🧾 RECIBO DEL RESTAURANTE\n\n";
-  recibo += `Mesa: ${mesa}\n\n`;
-  let total = 0;
-  const resumenProductos = [];
-
-  productos.forEach((producto, index) => {
-    const cantidad = parseInt(document.getElementById(`cantidad-${index}`)?.value || 0);
-
-    if (cantidad > 0) {
-      const subtotal = producto.precio * cantidad;
-      recibo += `${producto.nombre} x${cantidad} - ${formatoCOP(subtotal)}\n`;
-      total += subtotal;
-
-      resumenProductos.push({
-        nombre: producto.nombre,
-        precio: producto.precio,
-        cantidad,
-      });
-    }
-  });
-
-  if (resumenProductos.length === 0) {
-    alert("⚠️ No se seleccionaron productos con cantidad mayor a 0.");
-    return;
-  }
-
-  recibo += `\nTOTAL: ${formatoCOP(total)}`;
-  recibo += `\nFecha: ${new Date().toLocaleString("es-CO")}`;
-
-  // Guardar en el registro de actividad
-  const venta = {
-    mesa,
-    productos: resumenProductos,
-    total,
-    fecha: new Date().toLocaleString("es-CO"),
-  };
-
-  const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
-  registro.push(venta);
-  localStorage.setItem("registroVentas", JSON.stringify(registro));
-
-  // Imprimir
-  const ventana = window.open("", "", "width=400,height=600");
-  ventana.document.write(`<pre>${recibo}</pre>`);
-  ventana.print();
-
-  setTimeout(() => {
-    ventana.close();
-    reiniciarCantidades(); // Reinicia cantidades a 0 pero NO borra productos
-    alert("✅ Recibo impreso. Pedido registrado.");
-  }, 500);
-}
-
 function reiniciarCantidades() {
   const productos = obtenerProductos();
   mostrarProductos(); // Redibuja las tarjetas
 
-  // Reiniciar los inputs a 0 después de dibujar
   productos.forEach((_, index) => {
     const input = document.getElementById(`cantidad-${index}`);
     if (input) {
@@ -131,7 +63,7 @@ function reiniciarCantidades() {
     }
   });
 
-  calcularTotal(); // El total vuelve a 0
+  calcularTotal();
 }
 
 document.addEventListener("DOMContentLoaded", mostrarProductos);
