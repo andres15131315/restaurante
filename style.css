@@ -171,12 +171,16 @@ input[type="file"] {
   border-radius: 6px;
 }
 
-/* Botón de volver al menú */
+/* Encabezado fijo con botón de registro */
 .header-bar {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+  position: relative; /* Cambiado de absolute a relative */
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  padding: 10px;
 }
+
 
 /* Responsive */
 @media (max-width: 600px) {
