@@ -24,7 +24,7 @@ button {
   background-color: #4CAF50;
   color: white;
   border: none;
-  padding: 14px 24px; /* Botones más grandes */
+  padding: 14px 24px;
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
@@ -171,7 +171,24 @@ input[type="file"] {
   border-radius: 6px;
 }
 
-/* Responsive */
+/* Contenedor del botón Registro de Actividad */
+.header-bar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+}
+
+/* Botón Registro de Actividad */
+.header-bar button {
+  font-size: 14px;
+  padding: 10px 16px;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Responsive para móviles */
 @media (max-width: 600px) {
   .tarjeta {
     width: 100%;
@@ -192,29 +209,15 @@ input[type="file"] {
   .input-cantidad {
     width: 100%;
   }
-}
 
-
-/* Ajuste responsivo para el botón Registro de Actividad */
-.header-bar button {
-  font-size: 14px;
-  padding: 10px 16px;
-  max-width: 90vw;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@media (max-width: 600px) {
   .header-bar {
     justify-content: center;
-    width: 100%;
-    margin-bottom: 15px;
   }
 
   .header-bar button {
     font-size: 13px;
-    padding: 8px 14px;
+    padding: 8px 12px;
     width: 90%;
+    max-width: 90%;
   }
 }
