@@ -180,6 +180,10 @@ input[type="file"] {
   flex-wrap: wrap;
   padding: 10px;
 }
+.header-bar {
+  justify-content: center;
+  padding: 10px;
+}
 
 
 /* Responsive */
