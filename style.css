@@ -171,21 +171,6 @@ input[type="file"] {
   border-radius: 6px;
 }
 
-/* Encabezado fijo con botón de registro */
-.header-bar {
-  position: relative; /* Cambiado de absolute a relative */
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  padding: 10px;
-}
-.header-bar {
-  justify-content: center;
-  padding: 10px;
-}
-
-
 /* Responsive */
 @media (max-width: 600px) {
   .tarjeta {
@@ -206,5 +191,30 @@ input[type="file"] {
 
   .input-cantidad {
     width: 100%;
+  }
+}
+
+
+/* Ajuste responsivo para el botón Registro de Actividad */
+.header-bar button {
+  font-size: 14px;
+  padding: 10px 16px;
+  max-width: 90vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 600px) {
+  .header-bar {
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .header-bar button {
+    font-size: 13px;
+    padding: 8px 14px;
+    width: 90%;
   }
 }
