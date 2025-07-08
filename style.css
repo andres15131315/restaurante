@@ -171,18 +171,19 @@ input[type="file"] {
   border-radius: 6px;
 }
 
-/* Contenedor del botón Registro de Actividad */
+/* Botón de Registro de Actividad */
 .header-bar {
   display: flex;
   justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 10px;
 }
 
-/* Botón Registro de Actividad */
 .header-bar button {
   font-size: 14px;
   padding: 6px 10px;
-  max-width: 180px;
+  max-width: 200px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -210,7 +211,6 @@ input[type="file"] {
     width: 100%;
   }
 
-  /* Ajustes solo para el botón de actividad en móvil */
   .header-bar {
     justify-content: center;
     width: 100%;
