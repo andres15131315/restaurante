@@ -224,3 +224,52 @@ input[type="file"] {
     max-width: 80%;
   }
 }
+
+.acciones {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.acciones button {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.acciones .print {
+  background-color: #2196F3;
+  color: white;
+}
+
+.acciones .add {
+  background-color: #FF9800;
+  color: white;
+}
+
+.acciones .eliminar {
+  background-color: #e53935;
+  color: white;
+}
+
+.acciones button:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .acciones button {
+    width: 100%;
+    font-size: 18px;
+    padding: 12px;
+  }
+}

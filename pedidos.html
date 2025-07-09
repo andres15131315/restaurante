@@ -2,8 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pedidos Guardados</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="header-bar">
@@ -36,10 +37,13 @@
         let productosHTML = "";
         pedido.productos.forEach((p, i) => {
           productosHTML += `
-            <div style="margin-bottom:10px;">
-              <strong>${p.nombre}</strong> <br/>
-              Cantidad: <input type="number" value="${p.cantidad}" min="1" onchange="actualizarCantidad(${index}, ${i}, this.value)" class="input-cantidad"/>
-              <p>Precio: ${formatoCOP(p.precio)}</p>
+            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+              <input type="checkbox" id="producto-${index}-${i}" />
+              <div style="flex: 1;">
+                <strong>${p.nombre}</strong><br/>
+                Cantidad: <input type="number" value="${p.cantidad}" min="1" onchange="actualizarCantidad(${index}, ${i}, this.value)" class="input-cantidad" />
+                <p>Precio: ${formatoCOP(p.precio)}</p>
+              </div>
             </div>
           `;
         });
@@ -51,8 +55,11 @@
           <p>Fecha: ${pedido.fecha}</p>
           ${productosHTML}
           <p><strong>Total:</strong> ${formatoCOP(pedido.total)}</p>
-          <button onclick="imprimirPedido(${index})">🖨 Imprimir</button>
-          <button class="eliminar" onclick="eliminarPedido(${index})">🗑 Eliminar</button>
+          <div class="acciones">
+            <button class="print" onclick="imprimirPedido(${index})">🖨</button>
+            <button class="add" onclick="agregarProductoAPedido(${index})">➕</button>
+            <button class="eliminar" onclick="eliminarPedido(${index})">🗑</button>
+          </div>
         `;
         contenedor.appendChild(div);
       });
@@ -64,7 +71,6 @@
       const producto = pedido.productos[productoIndex];
       producto.cantidad = parseInt(nuevaCantidad);
 
-      // Recalcular total
       let nuevoTotal = 0;
       pedido.productos.forEach(p => {
         nuevoTotal += p.precio * p.cantidad;
@@ -94,6 +100,26 @@
       ventana.document.write(`<pre>${recibo}</pre>`);
       ventana.print();
       setTimeout(() => ventana.close(), 500);
+    }
+
+    function agregarProductoAPedido(index) {
+      const nombre = prompt("Nombre del nuevo producto:");
+      const precio = parseFloat(prompt("Precio del nuevo producto (COP):"));
+      const cantidad = parseInt(prompt("Cantidad:"));
+
+      if (!nombre || isNaN(precio) || isNaN(cantidad)) {
+        alert("⚠️ Datos inválidos.");
+        return;
+      }
+
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+      const pedido = registro[index];
+
+      pedido.productos.push({ nombre, precio, cantidad });
+      pedido.total += precio * cantidad;
+
+      localStorage.setItem("registroVentas", JSON.stringify(registro));
+      mostrarPedidosGuardados();
     }
 
     function eliminarPedido(index) {
