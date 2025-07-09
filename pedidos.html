@@ -1,10 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pedidos Guardados</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .btn-mini {
+      font-size: 12px;
+      padding: 6px 10px;
+      margin: 4px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-eliminar-producto {
+      background-color: #e53935;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-eliminar-producto:hover {
+      background-color: #c62828;
+    }
+
+    .producto-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .producto-info {
+      flex: 1;
+    }
+
+    @media (max-width: 600px) {
+      .producto-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="header-bar">
@@ -23,9 +66,18 @@
       });
     }
 
+    function getEntregaData() {
+      return JSON.parse(localStorage.getItem("estadoEntrega")) || {};
+    }
+
+    function setEntregaData(data) {
+      localStorage.setItem("estadoEntrega", JSON.stringify(data));
+    }
+
     function mostrarPedidosGuardados() {
       const contenedor = document.getElementById("contenedorPedidos");
       const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+      const estadoEntrega = getEntregaData();
 
       if (registro.length === 0) {
         contenedor.innerHTML = "<p>No hay pedidos guardados.</p>";
@@ -36,14 +88,18 @@
       registro.forEach((pedido, index) => {
         let productosHTML = "";
         pedido.productos.forEach((p, i) => {
+          const id = `pedido-${index}-prod-${i}`;
+          const entregado = estadoEntrega[id] || false;
+
           productosHTML += `
-            <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-              <input type="checkbox" id="producto-${index}-${i}" />
-              <div style="flex: 1;">
+            <div class="producto-item">
+              <input type="checkbox" ${entregado ? "checked" : ""} onchange="toggleEntregado('${id}', this.checked)" title="¿Ya se entregó?" />
+              <div class="producto-info">
                 <strong>${p.nombre}</strong><br/>
-                Cantidad: <input type="number" value="${p.cantidad}" min="1" onchange="actualizarCantidad(${index}, ${i}, this.value)" class="input-cantidad" />
+                Cantidad: <input type="number" value="${p.cantidad}" min="1" onchange="actualizarCantidad(${index}, ${i}, this.value)" class="input-cantidad"/>
                 <p>Precio: ${formatoCOP(p.precio)}</p>
               </div>
+              <button class="btn-eliminar-producto" onclick="eliminarProductoDePedido(${index}, ${i})">🗑</button>
             </div>
           `;
         });
@@ -55,14 +111,20 @@
           <p>Fecha: ${pedido.fecha}</p>
           ${productosHTML}
           <p><strong>Total:</strong> ${formatoCOP(pedido.total)}</p>
-          <div class="acciones">
-            <button class="print" onclick="imprimirPedido(${index})">🖨</button>
-            <button class="add" onclick="agregarProductoAPedido(${index})">➕</button>
-            <button class="eliminar" onclick="eliminarPedido(${index})">🗑</button>
+          <div style="display:flex; justify-content:center; gap:10px; flex-wrap: wrap; margin-top:10px;">
+            <button class="btn-mini" onclick="imprimirPedido(${index})">🖨 Imprimir Recibo</button>
+            <button class="btn-mini" onclick="agregarProductoAPedido(${index})">➕ Agregar Producto</button>
+            <button class="btn-mini eliminar" onclick="eliminarPedido(${index})">🗑 Eliminar Pedido</button>
           </div>
         `;
         contenedor.appendChild(div);
       });
+    }
+
+    function toggleEntregado(id, checked) {
+      const estadoEntrega = getEntregaData();
+      estadoEntrega[id] = checked;
+      setEntregaData(estadoEntrega);
     }
 
     function actualizarCantidad(pedidoIndex, productoIndex, nuevaCantidad) {
@@ -76,6 +138,24 @@
         nuevoTotal += p.precio * p.cantidad;
       });
       pedido.total = nuevoTotal;
+
+      localStorage.setItem("registroVentas", JSON.stringify(registro));
+      mostrarPedidosGuardados();
+    }
+
+    function eliminarProductoDePedido(pedidoIndex, productoIndex) {
+      const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+      const pedido = registro[pedidoIndex];
+
+      const producto = pedido.productos[productoIndex];
+      const subtotal = producto.precio * producto.cantidad;
+
+      pedido.productos.splice(productoIndex, 1);
+      pedido.total -= subtotal;
+
+      if (pedido.productos.length === 0) {
+        registro.splice(pedidoIndex, 1);
+      }
 
       localStorage.setItem("registroVentas", JSON.stringify(registro));
       mostrarPedidosGuardados();
@@ -102,9 +182,18 @@
       setTimeout(() => ventana.close(), 500);
     }
 
+    function eliminarPedido(index) {
+      if (confirm("¿Eliminar este pedido?")) {
+        const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
+        registro.splice(index, 1);
+        localStorage.setItem("registroVentas", JSON.stringify(registro));
+        mostrarPedidosGuardados();
+      }
+    }
+
     function agregarProductoAPedido(index) {
       const nombre = prompt("Nombre del nuevo producto:");
-      const precio = parseFloat(prompt("Precio del nuevo producto (COP):"));
+      const precio = parseFloat(prompt("Precio del producto:"));
       const cantidad = parseInt(prompt("Cantidad:"));
 
       if (!nombre || isNaN(precio) || isNaN(cantidad)) {
@@ -120,15 +209,6 @@
 
       localStorage.setItem("registroVentas", JSON.stringify(registro));
       mostrarPedidosGuardados();
-    }
-
-    function eliminarPedido(index) {
-      if (confirm("¿Eliminar este pedido?")) {
-        const registro = JSON.parse(localStorage.getItem("registroVentas")) || [];
-        registro.splice(index, 1);
-        localStorage.setItem("registroVentas", JSON.stringify(registro));
-        mostrarPedidosGuardados();
-      }
     }
 
     document.addEventListener("DOMContentLoaded", mostrarPedidosGuardados);
